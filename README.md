@@ -6,7 +6,7 @@ RazorSh4rk's random word API Website: https://random-word-api.herokuapp.com/home
 RazorSh4rk's random word API Github: https://github.com/RazorSh4rk/random-word-api
 
 # To-Do List:
-- Add UI
+- ~~Add UI~~
   - Improve on the design?
 - Add feature to store passwords
   - Store them in .JSON files
