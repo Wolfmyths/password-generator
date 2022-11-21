@@ -47,15 +47,17 @@ class passphrase:
         if length > 250:
             return f'The length "{length}" is too high, use 250 or below'
         
-        for i in range(length):
-            word = requests.get('https://random-word-api.herokuapp.com/word') # Access the random word API
-            word = word.text
-            word = word[2:-2] # word.text has brackets and quotations around it ( ["Example"] ) , this line removes those
+        word = requests.get(f'https://random-word-api.herokuapp.com/word?number={length}') # Access the random word API
+        word = word.text
+        word = word[1:-1]
+        word = word.split(',') # Converts the output of the api into a list instead of it being a string
+        for item in word:
+            item = item[1:-1] # Each item in word has quotations around it ( "Example" ) , this line removes those
             if self.capitalize == 'true':
-                word = word.title()
+                item = item.title()
             if password == '': # If statement determines if the word being added to the passphrase is the first word
-                password += word
+                password += item
             else:
-                password += f' {word}'
+                password += f' {item}'
         
         return password
