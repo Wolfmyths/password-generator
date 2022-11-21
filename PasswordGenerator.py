@@ -6,10 +6,10 @@ class password:
         self.strength = strength
         self.length = length
         self.capital = capital
-        self.alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-        self.symbols = ['!', '@', '#', '$', '&', '_']
-        self.number = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ]
-        self.charChoice = [self.alphabet, self.number, self.symbols]
+        self.alphabet = ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z')
+        self.symbols = ('!', '@', '#', '$', '&', '_')
+        self.number = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
+        self.charChoice = (self.alphabet, self.number, self.symbols)
 
     def get_pass(self):
         password = ''
