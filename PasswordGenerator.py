@@ -34,9 +34,10 @@ class password:
         return password
 
 class passphrase:
-    def __init__(self, length=0, capitalize=''):
+    def __init__(self, length=0, capitalize='', allcaps=''):
         self.length = length
         self.capitalize = capitalize
+        self.allcaps = allcaps
     
     def get_phrase(self):
         password = ''
@@ -52,9 +53,14 @@ class passphrase:
         word = word[1:-1]
         word = word.split(',') # Converts the output of the api into a list instead of it being a string
         for item in word:
+
             item = item[1:-1] # Each item in word has quotations around it ( "Example" ) , this line removes those
-            if self.capitalize == 'true':
+
+            if self.allcaps == 'true':
+                item = item.upper()
+            elif self.capitalize == 'true':
                 item = item.title()
+
             if password == '': # If statement determines if the word being added to the passphrase is the first word
                 password += item
             else:
