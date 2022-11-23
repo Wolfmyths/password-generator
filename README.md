@@ -8,8 +8,6 @@ RazorSh4rk's random word API Github: https://github.com/RazorSh4rk/random-word-a
 # To-Do List:
 - ~~Add UI~~
   - Improve on the design?
-- Add feature to store passwords
-  - Store them in .JSON files
 - Android .apk version?
   
 Disclaimer: This github repos was created to build up my programming portfolio. I have no experience in programming cyber security applications.
