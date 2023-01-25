@@ -1,9 +1,10 @@
 import tkinter as tk
 import pyperclip as pc
 import PasswordGenerator
+import threading
 
 root = tk.Tk()
-version = '1.2'
+version = '1.2.2'
 root.title(f"Wolfmyths' Password Generator V{version}")
 root.geometry('800x600')
 
@@ -22,12 +23,12 @@ class mainGUI:
                 self.passphraseLabel = tk.Label(passphraseSettingsFrame, text='Passphrase Settings', font=('Ariel', 18)).pack(padx=5, pady=10) # Passphrase Settings
 
                 self.does_phrase_start_capitals = tk.StringVar()
-                self.passphraseCapital = tk.Checkbutton(passphraseSettingsFrame, text='Each word starts with a capital letter', variable=self.does_phrase_start_capitals, offvalue='false', onvalue='true') # Each word starts with a capital letter
+                self.passphraseCapital = tk.Checkbutton(passphraseSettingsFrame, text='Each word starts with a capital letter', variable=self.does_phrase_start_capitals, offvalue=False, onvalue=True) # Each word starts with a capital letter
                 self.passphraseCapital.pack(padx=5, pady=5)
                 self.passphraseCapital.deselect()
 
                 self.phrase_allcaps = tk.StringVar()
-                self.passphraseCapital = tk.Checkbutton(passphraseSettingsFrame, text='Words are in all caps', variable=self.phrase_allcaps, offvalue='false', onvalue='true') # Every word is in caps
+                self.passphraseCapital = tk.Checkbutton(passphraseSettingsFrame, text='Words are in all caps', variable=self.phrase_allcaps, offvalue=False, onvalue=True) # Every word is in caps
                 self.passphraseCapital.pack(padx=5, pady=5)
                 self.passphraseCapital.deselect()
                 
@@ -45,12 +46,12 @@ class mainGUI:
                 self.passwordLabel = tk.Label(passwordSettingsFrame, text='Password Settings', font=('Ariel', 18)).pack(padx=5, pady=10) # Password Settings
 
                 self.does_pass_have_symbols = tk.StringVar()
-                self.passwordSymbols = tk.Checkbutton(passwordSettingsFrame, text='Symbols', variable=self.does_pass_have_symbols, offvalue='weak', onvalue='strong') # Symbols
+                self.passwordSymbols = tk.Checkbutton(passwordSettingsFrame, text='Symbols', variable=self.does_pass_have_symbols, offvalue=False, onvalue=True) # Symbols
                 self.passwordSymbols.pack(padx=5, pady=5)
                 self.passwordSymbols.select()
 
                 self.does_pass_have_capitals = tk.StringVar()
-                self.passwordCapital = tk.Checkbutton(passwordSettingsFrame, text='Random capital letters', variable=self.does_pass_have_capitals, offvalue='false', onvalue='true') # Random capital letters
+                self.passwordCapital = tk.Checkbutton(passwordSettingsFrame, text='Random capital letters', variable=self.does_pass_have_capitals, offvalue=False, onvalue=True) # Random capital letters
                 self.passwordCapital.pack(padx=5, pady=5)
                 self.passwordCapital.select()
 
@@ -73,32 +74,38 @@ class mainGUI:
                 def getpassclick(): # Inserts generated password to output
 
                         deleteOutput()
-                        getpassword = self.passwordLength.get()
-                        if getpassword.isdigit() == False and getpassword != '':
-                                return self.output.insert(1.0, f'Error: Password length option has an invalid input -> {getpassword}')
-                        elif getpassword == '':
-                                getpassword = 0
+                        getpasswordLength = self.passwordLength.get()
+                        getpasswordSymbol = True if self.does_pass_have_symbols.get() == '1' else False
+                        getpasswordCapital = True if self.does_pass_have_capitals.get() == '1' else False
 
-                        return self.output.insert(1.0, PasswordGenerator.password(self.does_pass_have_symbols.get(), getpassword, self.does_pass_have_capitals.get()).get_pass())
+                        if not getpasswordLength.isdigit() and getpasswordLength != '':
+                                return self.output.insert(1.0, f'Error: Password length option has an invalid input -> {getpasswordLength}')
+                        elif getpasswordLength == '':
+                                getpasswordLength = 0
+
+                        return self.output.insert(1.0, PasswordGenerator.password(symbols=getpasswordSymbol, length=getpasswordLength, capital=getpasswordCapital).get_pass())
 
                 def getphraseclick(): # Inserts generated passphrase to output !Lags program for a few seconds when the button is pressed (I don't know why)!
 
                         deleteOutput()
-                        getphrase = self.passphraseLength.get()
-                        if getphrase.isdigit() == False and getphrase != '':
-                                return self.output.insert(1.0, f'Error: Passphrase length option has an invalid input -> {getphrase}')
-                        elif getphrase == '':
-                                getphrase = 0
+                        getphraseLength = self.passphraseLength.get()
+                        getpassphraseCapital = True if self.does_phrase_start_capitals.get() == '1' else False
+                        getpassphraseAllcaps = True if self.phrase_allcaps.get() == '1' else False
+
+                        if getphraseLength.isdigit() == False and getphraseLength != '':
+                                return self.output.insert(1.0, f'Error: Passphrase length option has an invalid input -> {getphraseLength}')
+                        elif getphraseLength == '':
+                                getphraseLength = 0
                         
-                        return self.output.insert(1.0, PasswordGenerator.passphrase(getphrase, self.does_phrase_start_capitals.get(), self.phrase_allcaps.get()).get_phrase())
+                        return self.output.insert(1.0, PasswordGenerator.passphrase(getphraseLength, getpassphraseCapital, getpassphraseAllcaps ).get_phrase())
                 
-                lagWarning = tk.Label(master, text='Just a heads up! The passphrase button may take a couple seconds to load.') # Quick warning label that will be removed once the lag issue is resolved
+                lagWarning = tk.Label(master, text='Just a heads up! The passphrase button may take a couple seconds to load depending on internet speed.') # Quick warning label that will be removed once the lag issue is resolved
                 lagWarning.pack()
 
                 # Start of Button Frame
                 generateButtonsFrame = tk.Frame(master)
-                self.makePassword = tk.Button(generateButtonsFrame, text='Generate Password', font=('Ariel', 18), command=getpassclick).place(relx=0.7, rely=0.5, anchor='center')
-                self.makePassphrase = tk.Button(generateButtonsFrame, text='Generate Passphrase', font=('Ariel', 18), command=getphraseclick).place(relx=0.3, rely=0.5, anchor='center')
+                self.makePassword = tk.Button(generateButtonsFrame, text='Generate Password', font=('Ariel', 18), command=threading.Thread(target=getpassclick).start).place(relx=0.7, rely=0.5, anchor='center')
+                self.makePassphrase = tk.Button(generateButtonsFrame, text='Generate Passphrase', font=('Ariel', 18), command=threading.Thread(target=getphraseclick).start).place(relx=0.3, rely=0.5, anchor='center')
 
                 generateButtonsFrame.pack(padx=10, pady=10, expand=True, fill='both')
                 # End of Button Frame
@@ -116,8 +123,10 @@ class mainGUI:
                 
                 def copytoclipboard():
                         getText = self.output.get(index1=1.0, index2='end')
+
                         if len(getText) == 1 or getText.startswith('Error:'):
                                 return self.stringvar.set('Nothing to copy')
+
                         pc.copy(getText)
                         return self.stringvar.set('Secret copied!')
                 
